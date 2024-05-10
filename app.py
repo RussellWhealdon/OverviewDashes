@@ -10,7 +10,7 @@ import statsmodels.api as sm
 from plotly.subplots import make_subplots
 from prophet import Prophet
 from datetime import datetime, timedelta
-st.set_page_config(page_title="SunPower Overview Dash",page_icon="🧑‍🚀",layout="wide")
+st.set_page_config(page_title="Account Overview Dash",page_icon="🧑‍🚀",layout="wide")
 
 def password_protection():
         main_dashboard()
