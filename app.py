@@ -54,101 +54,100 @@ def main_dashboard():
         max_value=datetime.now().date()
     )
 
-    with st.expander("Filter Dashboard"):
-            #Set up Channel Filter
-            if 'channels_unique' not in st.session_state:
-                st.session_state.channels_unique = list(st.session_state.full_data["Channel_Non_Truth"].unique())
-                # Initialize selected channels to all channels
-                st.session_state.selected_channels = st.session_state.channels_unique
-            
-            with st.expander("Filter Channel"):
-                selected_channels = [channel for channel in st.session_state.channels_unique 
-                                    if st.checkbox(channel, value=(channel in st.session_state.selected_channels), key=channel)]
-            # Set up Type filter
-            if 'types_unique' not in st.session_state:
-                st.session_state.types_unique = list(st.session_state.full_data["Type"].unique())
-                # Initialize selected types to all types
-                st.session_state.selected_types = st.session_state.types_unique
-            
-            with st.expander("Filter Type"):
-                selected_types = [typ for typ in st.session_state.types_unique if st.checkbox(typ, value=(typ in st.session_state.selected_types), key="type_" + typ)]
+    #Set up Channel Filter
+    if 'channels_unique' not in st.session_state:
+        st.session_state.channels_unique = list(st.session_state.full_data["Channel_Non_Truth"].unique())
+        # Initialize selected channels to all channels
+        st.session_state.selected_channels = st.session_state.channels_unique
+    
+    with st.expander("Filter Channel"):
+        selected_channels = [channel for channel in st.session_state.channels_unique 
+                            if st.checkbox(channel, value=(channel in st.session_state.selected_channels), key=channel)]
+    # Set up Type filter
+    if 'types_unique' not in st.session_state:
+        st.session_state.types_unique = list(st.session_state.full_data["Type"].unique())
+        # Initialize selected types to all types
+        st.session_state.selected_types = st.session_state.types_unique
+    
+    with st.expander("Filter Type"):
+        selected_types = [typ for typ in st.session_state.types_unique if st.checkbox(typ, value=(typ in st.session_state.selected_types), key="type_" + typ)]
+
+    # Fill NaN values in 'State_Name' with a placeholder like 'Not Entered'
+    st.session_state.full_data['State_Name'].fillna('Not Entered', inplace=True)
+    
+    # Set up State Filter
+    if 'states_unique' not in st.session_state:
+        st.session_state.states_unique = list(st.session_state.full_data["State_Name"].unique())
+        st.session_state.selected_states = st.session_state.states_unique.copy()
+        st.session_state.interim_selected_states = st.session_state.selected_states.copy()  # Initialize it here
+    
+    with st.expander("Filter State"):
+        # Ensure initialization for safety
+        if 'interim_selected_states' not in st.session_state:
+            st.session_state.interim_selected_states = st.session_state.selected_states.copy()
         
-            # Fill NaN values in 'State_Name' with a placeholder like 'Not Entered'
-            st.session_state.full_data['State_Name'].fillna('Not Entered', inplace=True)
-            
-            # Set up State Filter
-            if 'states_unique' not in st.session_state:
-                st.session_state.states_unique = list(st.session_state.full_data["State_Name"].unique())
-                st.session_state.selected_states = st.session_state.states_unique.copy()
-                st.session_state.interim_selected_states = st.session_state.selected_states.copy()  # Initialize it here
-            
-            with st.expander("Filter State"):
-                # Ensure initialization for safety
-                if 'interim_selected_states' not in st.session_state:
-                    st.session_state.interim_selected_states = st.session_state.selected_states.copy()
+        # Toggle button
+        if st.button("Select All States" if len(st.session_state.interim_selected_states) < len(st.session_state.states_unique) else "Clear All States"):
+            if len(st.session_state.interim_selected_states) < len(st.session_state.states_unique):
+                st.session_state.interim_selected_states = st.session_state.states_unique.copy()
+            else:
+                st.session_state.interim_selected_states = []
                 
-                # Toggle button
-                if st.button("Select All States" if len(st.session_state.interim_selected_states) < len(st.session_state.states_unique) else "Clear All States"):
-                    if len(st.session_state.interim_selected_states) < len(st.session_state.states_unique):
-                        st.session_state.interim_selected_states = st.session_state.states_unique.copy()
-                    else:
-                        st.session_state.interim_selected_states = []
-                        
-                selected_states = []
-                for state in st.session_state.states_unique:
-                    if st.checkbox(state, value=(state in st.session_state.interim_selected_states)):
-                        selected_states.append(state)
-                if selected_states:
-                    st.session_state.interim_selected_states = selected_states
+        selected_states = []
+        for state in st.session_state.states_unique:
+            if st.checkbox(state, value=(state in st.session_state.interim_selected_states)):
+                selected_states.append(state)
+        if selected_states:
+            st.session_state.interim_selected_states = selected_states
+
+    # Replace null values in 'Campaign' with 'Not Entered'
+    st.session_state.full_data['Campaign'].fillna('Not Entered', inplace=True)
+    
+    # Set up Campaign Filter
+    if 'campaigns_unique' not in st.session_state:
+        st.session_state.campaigns_unique = list(st.session_state.full_data["Campaign"].unique())
+        st.session_state.selected_campaigns = st.session_state.campaigns_unique.copy()
+        st.session_state.interim_selected_campaigns = st.session_state.selected_campaigns.copy()  # Initialize it here
         
-            # Replace null values in 'Campaign' with 'Not Entered'
-            st.session_state.full_data['Campaign'].fillna('Not Entered', inplace=True)
-            
-            # Set up Campaign Filter
-            if 'campaigns_unique' not in st.session_state:
-                st.session_state.campaigns_unique = list(st.session_state.full_data["Campaign"].unique())
-                st.session_state.selected_campaigns = st.session_state.campaigns_unique.copy()
-                st.session_state.interim_selected_campaigns = st.session_state.selected_campaigns.copy()  # Initialize it here
-                
-            with st.expander("Filter Campaign"):
-                # Ensure initialization for safety
-                if 'interim_selected_campaigns' not in st.session_state:
-                    st.session_state.interim_selected_campaigns = st.session_state.selected_campaigns.copy()
-                
-                # Toggle button
-                if st.button("Select All Campaigns" if len(st.session_state.interim_selected_campaigns) < len(st.session_state.campaigns_unique) else "Clear All Campaigns"):
-                    if len(st.session_state.interim_selected_campaigns) < len(st.session_state.campaigns_unique):
-                        st.session_state.interim_selected_campaigns = st.session_state.campaigns_unique.copy()
-                    else:
-                        st.session_state.interim_selected_campaigns = []
-                        
-                selected_campaigns = []
-                for index, campaign in enumerate(st.session_state.campaigns_unique):
-                    # Use the index to generate a unique key for each checkbox
-                    if st.checkbox(campaign, value=(campaign in st.session_state.interim_selected_campaigns), key=f"campaign_{index}"):
-                        selected_campaigns.append(campaign)
-                if selected_campaigns:
-                    st.session_state.interim_selected_campaigns = selected_campaigns
-                    
-            if st.button("Re-run"):
-                data = st.session_state.full_data.copy()
-                st.session_state.selected_campaigns = st.session_state.interim_selected_campaigns.copy()
-                st.session_state.selected_states = st.session_state.interim_selected_states.copy()
-                st.session_state.selected_channels = selected_channels
-                st.session_state.selected_types = selected_types
-                st.session_state['start_date'] = start_date
-                st.session_state['end_date'] = end_date
-            
+    with st.expander("Filter Campaign"):
+        # Ensure initialization for safety
+        if 'interim_selected_campaigns' not in st.session_state:
+            st.session_state.interim_selected_campaigns = st.session_state.selected_campaigns.copy()
         
-            # Start with the full dataset
-            data = st.session_state.full_data.copy()
+        # Toggle button
+        if st.button("Select All Campaigns" if len(st.session_state.interim_selected_campaigns) < len(st.session_state.campaigns_unique) else "Clear All Campaigns"):
+            if len(st.session_state.interim_selected_campaigns) < len(st.session_state.campaigns_unique):
+                st.session_state.interim_selected_campaigns = st.session_state.campaigns_unique.copy()
+            else:
+                st.session_state.interim_selected_campaigns = []
+                
+        selected_campaigns = []
+        for index, campaign in enumerate(st.session_state.campaigns_unique):
+            # Use the index to generate a unique key for each checkbox
+            if st.checkbox(campaign, value=(campaign in st.session_state.interim_selected_campaigns), key=f"campaign_{index}"):
+                selected_campaigns.append(campaign)
+        if selected_campaigns:
+            st.session_state.interim_selected_campaigns = selected_campaigns
             
-           # Define the filters
-            data = data[(data['Date'] >= st.session_state['start_date']) & (data['Date'] <= st.session_state['end_date'])]
-            channel_filter = data["Channel_Non_Truth"].isin(st.session_state.selected_channels)
-            type_filter = data["Type"].isin(st.session_state.selected_types)
-            state_filter = data["State_Name"].isin(st.session_state.selected_states)
-            campaign_filter = data["Campaign"].isin(st.session_state.selected_campaigns)
+    if st.button("Re-run"):
+        data = st.session_state.full_data.copy()
+        st.session_state.selected_campaigns = st.session_state.interim_selected_campaigns.copy()
+        st.session_state.selected_states = st.session_state.interim_selected_states.copy()
+        st.session_state.selected_channels = selected_channels
+        st.session_state.selected_types = selected_types
+        st.session_state['start_date'] = start_date
+        st.session_state['end_date'] = end_date
+    
+
+    # Start with the full dataset
+    data = st.session_state.full_data.copy()
+    
+   # Define the filters
+    data = data[(data['Date'] >= st.session_state['start_date']) & (data['Date'] <= st.session_state['end_date'])]
+    channel_filter = data["Channel_Non_Truth"].isin(st.session_state.selected_channels)
+    type_filter = data["Type"].isin(st.session_state.selected_types)
+    state_filter = data["State_Name"].isin(st.session_state.selected_states)
+    campaign_filter = data["Campaign"].isin(st.session_state.selected_campaigns)
             
     # Apply all filters at once
     data = data[channel_filter & type_filter & state_filter & campaign_filter]
