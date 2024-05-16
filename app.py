@@ -27,7 +27,7 @@ def main_dashboard():
         client = bigquery.Client(credentials=credentials)
         # Modify the query
         query = f"""
-        SELECT * FROM `sunpower-375201.sunpower_agg.sunpower_full_funnel` 
+        SELECT * FROM `rw-testdb.DummyData.AccountDummyData` 
         WHERE Date BETWEEN '{one_year_ago}' AND CURRENT_DATE() """
         st.session_state.full_data = pandas.read_gbq(query, credentials=credentials)
 
